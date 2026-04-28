@@ -34,12 +34,15 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
+    "jest": "^30.3.0",
     "postcss": "^8.5",
     "tailwindcss": "4.1.17",
+    "ts-jest": "^29.4.9",
     "tsx": "^4.19.4",
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }
