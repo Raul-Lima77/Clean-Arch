@@ -9,7 +9,6 @@ export class CreateUsuario implements UseCase<CreateUsuarioInputDTO, CreateUsuar
 
   public async execute(inputDto: CreateUsuarioInputDTO): Promise<CreateUsuarioOutputDTO> {
     
-    // Verificar se email já existe
     const usuarioExistente = await this.usuarioRepositorio.buscarPorEmail(inputDto.email)
     if (usuarioExistente) {
       throw new Error("E-mail já cadastrado")
