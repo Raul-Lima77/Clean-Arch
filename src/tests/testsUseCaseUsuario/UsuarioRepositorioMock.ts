@@ -1,9 +1,8 @@
 import type { UsuarioRepositorio } from "../../dominio/repositorios/UsuarioRepositorio"
 import type { Usuario } from "../../dominio/entidades/Usuario"
 
-// Este é o nosso repositório dublê (Mock)
 export class UsuarioRepositorioMock implements UsuarioRepositorio {
-  // Criamos uma lista em memória para simular a tabela do banco de dados
+  
   public usuarios: Usuario[] = []
 
   async buscarPorId(id: string): Promise<Usuario | null> {
