@@ -1,4 +1,6 @@
 import { CreateUsuario } from "../../aplicacao/usecase/usuario/CreateUsuario"
+import type { CreateUsuarioInputDTO } from "../../aplicacao/dto/usuario/CreateUsuarioInputDTO"
+import type { CreateUsuarioOutputDTO } from "../../aplicacao/dto/usuario/CreateUsuarioOutputDTO"
 import { UsuarioRepositorioMock } from "../testsUseCaseUsuario/UsuarioRepositorioMock" 
 
 describe("Caso de Uso - CreateUsuario", () => {
@@ -13,14 +15,14 @@ describe("Caso de Uso - CreateUsuario", () => {
   
   it("deve cadastrar um usuário com sucesso quando os dados forem válidos", async () => {
     
-    const inputDto = {
+    const inputDto: CreateUsuarioInputDTO = {
       nome: "Maria Alice",
       email: "alice@email.com",
       senha: "senhaSegura123"
     }
 
     
-    const resultado = await sut.execute(inputDto)
+    const resultado: CreateUsuarioOutputDTO = await sut.execute(inputDto)
 
    
     expect(resultado).toHaveProperty("id") 
@@ -31,7 +33,7 @@ describe("Caso de Uso - CreateUsuario", () => {
   
   it("deve lançar um erro se o e-mail já estiver cadastrado no sistema", async () => {
 
-    const inputDto = {
+    const inputDto: CreateUsuarioInputDTO = {
       nome: "Maria Alice",
       email: "duplicado@email.com",
       senha: "senhaSegura123"
@@ -41,7 +43,7 @@ describe("Caso de Uso - CreateUsuario", () => {
     await sut.execute(inputDto)
 
     
-    const inputDtoDuplicado = {
+    const inputDtoDuplicado: CreateUsuarioInputDTO = {
       nome: "Outro Nome",
       email: "duplicado@email.com",
       senha: "outraSenha123"

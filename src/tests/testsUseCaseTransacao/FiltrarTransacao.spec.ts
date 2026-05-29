@@ -1,4 +1,5 @@
 import { FiltrarTransacao } from "../../aplicacao/usecase/transacao/FiltrarTransacao"
+import type { FiltrarTransacaoInputDTO } from "../../aplicacao/dto/transacao/FiltrarTransacaoInputDTO"
 import { TransacaoRepositorioMock } from "./TransacaoRepositorioMock"
 import { Transacao } from "../../dominio/entidades/Transacao"
 
@@ -21,7 +22,7 @@ describe("Caso de Uso - FiltrarTransacao", () => {
     await repositorioMock.salvar(transacao1)
     await repositorioMock.salvar(transacao2)
 
-    const inputDto = {
+    const inputDto: FiltrarTransacaoInputDTO = {
       usuarioId: "usuario-123",
       dataInicio,
       dataFim
@@ -44,7 +45,7 @@ describe("Caso de Uso - FiltrarTransacao", () => {
     await repositorioMock.salvar(transacao2)
     await repositorioMock.salvar(transacao3)
 
-    const inputDto = {
+    const inputDto: FiltrarTransacaoInputDTO = {
       usuarioId: "usuario-123",
       categoriaId: "categoria-1"
     }
@@ -64,7 +65,7 @@ describe("Caso de Uso - FiltrarTransacao", () => {
     await repositorioMock.salvar(transacao1)
     await repositorioMock.salvar(transacao2)
 
-    const inputDto = {
+    const inputDto: FiltrarTransacaoInputDTO = {
       usuarioId: "usuario-123"
     }
 
@@ -77,7 +78,7 @@ describe("Caso de Uso - FiltrarTransacao", () => {
     const dataInicio = new Date("2024-12-31")
     const dataFim = new Date("2024-01-01")
 
-    const inputDto = {
+    const inputDto: FiltrarTransacaoInputDTO = {
       usuarioId: "usuario-123",
       dataInicio,
       dataFim
@@ -93,7 +94,7 @@ describe("Caso de Uso - FiltrarTransacao", () => {
     const transacao = Transacao.create("RECEITA", "Salário", 3000, new Date("2024-12-15"), "usuario-123", "categoria-1")
     await repositorioMock.salvar(transacao)
 
-    const inputDto = {
+    const inputDto: FiltrarTransacaoInputDTO = {
       usuarioId: "usuario-123",
       dataInicio,
       dataFim

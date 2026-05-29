@@ -1,4 +1,5 @@
 import { EditarPerfil } from "../../aplicacao/usecase/usuario/EditarPerfil"
+import type { EditarPerfilInputDTO } from "../../aplicacao/dto/usuario/EditarPerfilInputDTO"
 import { UsuarioRepositorioMock } from "./UsuarioRepositorioMock"
 import { Usuario } from "../../dominio/entidades/Usuario"
 
@@ -18,7 +19,7 @@ describe("Caso de Uso - EditarPerfil", () => {
     await repositorioMock.salvar(usuario)
 
     
-    const inputDto = {
+    const inputDto: EditarPerfilInputDTO = {
       usuarioId: usuario.id,
       nome: "Alice Freitas", 
       email: "alice.freitas@email.com" 
@@ -33,7 +34,7 @@ describe("Caso de Uso - EditarPerfil", () => {
   })
 
   it("deve lançar um erro se o ID do usuário não existir", async () => {
-    const inputDto = {
+    const inputDto: EditarPerfilInputDTO = {
       usuarioId: "id-qualquer-que-nao-existe",
       nome: "Nome Qualquer",
       email: "email@qualquer.com"

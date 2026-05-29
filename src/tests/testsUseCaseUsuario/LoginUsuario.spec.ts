@@ -1,4 +1,6 @@
 import { LoginUsuario } from "../../aplicacao/usecase/usuario/LoginUsuario"
+import type { LoginUsuarioInputDTO } from "../../aplicacao/dto/usuario/LoginUsuarioInputDTO"
+import type { LoginUsuarioOutputDTO } from "../../aplicacao/dto/usuario/LoginUsuarioOutputDTO"
 import { UsuarioRepositorioMock } from "./UsuarioRepositorioMock"
 import { Usuario } from "../../dominio/entidades/Usuario"
 
@@ -19,12 +21,12 @@ describe("Caso de Uso - LoginUsuario", () => {
     await repositorioMock.salvar(usuarioCadastrado)
 
     
-    const inputDto = {
+    const inputDto: LoginUsuarioInputDTO = {
       email: "alice@email.com",
       senha: "senhaSegura123"
     }
 
-    const resultado = await sut.execute(inputDto)
+    const resultado: LoginUsuarioOutputDTO = await sut.execute(inputDto)
 
     
     expect(resultado).toHaveProperty("id")
@@ -33,7 +35,7 @@ describe("Caso de Uso - LoginUsuario", () => {
   })
 
   it("deve lançar um erro se o e-mail não estiver cadastrado", async () => {
-    const inputDto = {
+    const inputDto: LoginUsuarioInputDTO = {
       email: "inexistente@email.com",
       senha: "senhaQualquer"
     }
@@ -49,7 +51,7 @@ describe("Caso de Uso - LoginUsuario", () => {
     await repositorioMock.salvar(usuarioCadastrado)
 
     
-    const inputDto = {
+    const inputDto: LoginUsuarioInputDTO = {
       email: "alice@email.com",
       senha: "senhaErrada123"
     }

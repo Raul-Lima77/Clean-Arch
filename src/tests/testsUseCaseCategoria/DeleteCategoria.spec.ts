@@ -1,24 +1,31 @@
 import { DeleteCategoria } from "../../aplicacao/usecase/categoria/DeleteCategoria"
-import { CategoriaRepositorioMock } from "./CategoriaRepositorioMock"
-import { TransacaoRepositorioMock } from "../testsUseCaseTransacao/TransacaoRepositorioMock"
+import type { DeleteCategoriaDTO } from "../../aplicacao/dto/categoria/DeleteCategoriaDTO"
+import { CategoriaRepositorioMysql } from "../../infra/bd/mysql/CategoriaRepositorioMysql"
+import { TransacaoRepositorioMysql } from "../../infra/bd/mysql/TransacaoRepositorioMysql"
 import { Categoria } from "../../dominio/entidades/Categoria"
 
+jest.mock("../../infra/bd/mysql/CategoriaRepositorioMysql")
+jest.mock("../../infra/bd/mysql/TransacaoRepositorioMysql")
+
 describe("Caso de Uso - DeleteCategoria", () => {
-  let categoriaRepositorioMock: CategoriaRepositorioMock
-  let transacaoRepositorioMock: TransacaoRepositorioMock
+  let categoriaRepositorioMock: jest.Mocked<CategoriaRepositorioMysql>
+  let transacaoRepositorioMock: jest.Mocked<TransacaoRepositorioMysql>
   let sut: DeleteCategoria
 
   beforeEach(() => {
-    categoriaRepositorioMock = new CategoriaRepositorioMock()
-    transacaoRepositorioMock = new TransacaoRepositorioMock()
+    categoriaRepositorioMock = new CategoriaRepositorioMysql() as jest.Mocked<CategoriaRepositorioMysql>
+    transacaoRepositorioMock = new TransacaoRepositorioMysql() as jest.Mocked<TransacaoRepositorioMysql>
     sut = new DeleteCategoria(categoriaRepositorioMock, transacaoRepositorioMock)
   })
 
   it("deve deletar uma categoria com sucesso quando ela não estiver em uso", async () => {
     const categoria = Categoria.create("Alimentação", "usuario-123", 500)
-    await categoriaRepositorioMock.salvar(categoria)
+    
+    categoriaRepositorioMock.buscarPorId.mockResolvedValueOnce(categoria)
+    transacaoRepositorioMock.filtrarPorCategoria.mockResolvedValueOnce([])
+    categoriaRepositorioMock.remover.mockResolvedValueOnce(true)
 
-    const inputDto = {
+    const inputDto: DeleteCategoriaDTO = {
       id: categoria.id,
       usuarioId: "usuario-123"
     }
@@ -26,11 +33,13 @@ describe("Caso de Uso - DeleteCategoria", () => {
     const resultado = await sut.execute(inputDto)
 
     expect(resultado).toBe(true)
-    expect(categoriaRepositorioMock.categorias.length).toBe(0)
+    expect(categoriaRepositorioMock.remover).toHaveBeenCalledWith(categoria.id)
   })
 
   it("deve lançar um erro se a categoria não existir", async () => {
-    const inputDto = {
+    categoriaRepositorioMock.buscarPorId.mockResolvedValueOnce(null)
+
+    const inputDto: DeleteCategoriaDTO = {
       id: "id-inexistente",
       usuarioId: "usuario-123"
     }
@@ -40,9 +49,9 @@ describe("Caso de Uso - DeleteCategoria", () => {
 
   it("deve lançar um erro se o usuário não for o dono da categoria", async () => {
     const categoria = Categoria.create("Transporte", "usuario-123", 300)
-    await categoriaRepositorioMock.salvar(categoria)
+    categoriaRepositorioMock.buscarPorId.mockResolvedValueOnce(categoria)
 
-    const inputDto = {
+    const inputDto: DeleteCategoriaDTO = {
       id: categoria.id,
       usuarioId: "usuario-diferente"
     }
@@ -52,12 +61,11 @@ describe("Caso de Uso - DeleteCategoria", () => {
 
   it("deve lançar um erro se a categoria estiver em uso por alguma transação", async () => {
     const categoria = Categoria.create("Lazer", "usuario-123", 200)
-    await categoriaRepositorioMock.salvar(categoria)
+    
+    categoriaRepositorioMock.buscarPorId.mockResolvedValueOnce(categoria)
+    transacaoRepositorioMock.filtrarPorCategoria.mockResolvedValueOnce([{ id: "transacao-1" }] as any)
 
-    // Simular que existe uma transação usando esta categoria
-    transacaoRepositorioMock.setFiltrarPorCategoriaResponse([{ id: "transacao-1" }] as any)
-
-    const inputDto = {
+    const inputDto: DeleteCategoriaDTO = {
       id: categoria.id,
       usuarioId: "usuario-123"
     }

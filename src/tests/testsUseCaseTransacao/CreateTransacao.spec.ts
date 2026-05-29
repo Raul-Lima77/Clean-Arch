@@ -1,4 +1,6 @@
 import { CreateTransacao } from "../../aplicacao/usecase/transacao/CreateTransacao"
+import type { CreateTransacaoInputDTO } from "../../aplicacao/dto/transacao/CreateTransacaoInputDTO"
+import type { CreateTransacaoOutputDTO } from "../../aplicacao/dto/transacao/CreateTransacaoOutputDTO"
 import { TransacaoRepositorioMock } from "./TransacaoRepositorioMock"
 import { UsuarioRepositorioMock } from "../testsUseCaseUsuario/UsuarioRepositorioMock"
 import { Usuario } from "../../dominio/entidades/Usuario"
@@ -18,7 +20,7 @@ describe("Caso de Uso - CreateTransacao", () => {
     const usuario = Usuario.create("João", "joao@email.com", "senha123")
     await usuarioRepositorioMock.salvar(usuario)
 
-    const inputDto = {
+    const inputDto: CreateTransacaoInputDTO = {
       tipo: "RECEITA" as const,
       descricao: "Salário",
       valor: 3000,
@@ -27,7 +29,7 @@ describe("Caso de Uso - CreateTransacao", () => {
       categoriaId: "categoria-123"
     }
 
-    const resultado = await sut.execute(inputDto)
+    const resultado: CreateTransacaoOutputDTO = await sut.execute(inputDto)
 
     expect(resultado).toHaveProperty("id")
     expect(resultado).toHaveProperty("novoSaldo")
@@ -40,7 +42,7 @@ describe("Caso de Uso - CreateTransacao", () => {
     usuario.atualizarSaldo(5000)
     await usuarioRepositorioMock.salvar(usuario)
 
-    const inputDto = {
+    const inputDto: CreateTransacaoInputDTO = {
       tipo: "DESPESA" as const,
       descricao: "Supermercado",
       valor: 200,
@@ -49,7 +51,7 @@ describe("Caso de Uso - CreateTransacao", () => {
       categoriaId: "categoria-456"
     }
 
-    const resultado = await sut.execute(inputDto)
+    const resultado: CreateTransacaoOutputDTO = await sut.execute(inputDto)
 
     expect(resultado).toHaveProperty("id")
     expect(resultado.novoSaldo).toBe(4800)
@@ -57,7 +59,7 @@ describe("Caso de Uso - CreateTransacao", () => {
   })
 
   it("deve lançar um erro se o usuário não existir", async () => {
-    const inputDto = {
+    const inputDto: CreateTransacaoInputDTO = {
       tipo: "RECEITA" as const,
       descricao: "Transação",
       valor: 100,
@@ -73,7 +75,7 @@ describe("Caso de Uso - CreateTransacao", () => {
     const usuario = Usuario.create("Pedro", "pedro@email.com", "senha123")
     await usuarioRepositorioMock.salvar(usuario)
 
-    const inputDto = {
+    const inputDto: CreateTransacaoInputDTO = {
       tipo: "RECEITA" as const,
       descricao: "Bônus",
       valor: 1500,

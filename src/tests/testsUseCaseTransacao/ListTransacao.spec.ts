@@ -1,4 +1,5 @@
 import { ListTransacao } from "../../aplicacao/usecase/transacao/ListTransacao"
+import type { ListTransacaoDTO } from "../../aplicacao/dto/transacao/ListTransacaoDTO"
 import { TransacaoRepositorioMock } from "./TransacaoRepositorioMock"
 import { Transacao } from "../../dominio/entidades/Transacao"
 
@@ -22,7 +23,7 @@ describe("Caso de Uso - ListTransacao", () => {
     await repositorioMock.salvar(transacao2)
     await repositorioMock.salvar(transacao3)
 
-    const resultado = await sut.execute({ usuarioId: "usuario-123" })
+    const resultado: ListTransacaoDTO[] = await sut.execute({ usuarioId: "usuario-123" })
 
     expect(resultado).toHaveLength(3)
     expect(resultado[0].tipo).toBe("RECEITA")
@@ -41,14 +42,14 @@ describe("Caso de Uso - ListTransacao", () => {
     await repositorioMock.salvar(transacao2)
     await repositorioMock.salvar(transacao3)
 
-    const resultado = await sut.execute({ usuarioId: "usuario-123" })
+    const resultado: ListTransacaoDTO[] = await sut.execute({ usuarioId: "usuario-123" })
 
     expect(resultado).toHaveLength(2)
     expect(resultado.every(t => t.id === transacao1.id || t.id === transacao3.id)).toBe(true)
   })
 
   it("deve retornar um array vazio se o usuário não tiver transações", async () => {
-    const resultado = await sut.execute({ usuarioId: "usuario-sem-transacoes" })
+    const resultado: ListTransacaoDTO[] = await sut.execute({ usuarioId: "usuario-sem-transacoes" })
 
     expect(resultado).toHaveLength(0)
     expect(Array.isArray(resultado)).toBe(true)
@@ -60,7 +61,7 @@ describe("Caso de Uso - ListTransacao", () => {
     const transacao = Transacao.create("RECEITA", "Salário", 3000, data, "usuario-123", "categoria-1")
     await repositorioMock.salvar(transacao)
 
-    const resultado = await sut.execute({ usuarioId: "usuario-123" })
+    const resultado: ListTransacaoDTO[] = await sut.execute({ usuarioId: "usuario-123" })
 
     expect(resultado[0]).toHaveProperty("id")
     expect(resultado[0]).toHaveProperty("tipo")
