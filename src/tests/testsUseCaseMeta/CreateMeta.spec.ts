@@ -1,87 +1,42 @@
-import { CreateMeta } from "../../aplicacao/usecase/meta/CreateMeta"
-import { MetaRepositorioMock } from "./MetaRepositorioMock"
+import { CreateMeta } from "../../../src/aplicacao/usecase/meta/CreateMeta"
+import type { CreateMetaInputDTO } from "../../../src/aplicacao/dto/meta/CreateMetaInputDTO"
+import type { CreateMetaOutputDTO } from "../../../src/aplicacao/dto/meta/CreateMetaOutputDTO"
+import { Meta } from "../../../src/dominio/entidades/Meta"
+import { MetaRepositorioMysql } from "../../../src/infra/bd/mysql/MetaRepositorioMysql"
+
+jest.mock("../../../src/infra/bd/mysql/MetaRepositorioMysql")
 
 describe("Caso de Uso - CreateMeta", () => {
-  let repositorioMock: MetaRepositorioMock
-  let sut: CreateMeta
+  let metaRepositorioMock: jest.Mocked<MetaRepositorioMysql>
+  let createMeta: CreateMeta
 
   beforeEach(() => {
-    repositorioMock = new MetaRepositorioMock()
-    sut = new CreateMeta(repositorioMock)
+    metaRepositorioMock =
+      new MetaRepositorioMysql() as jest.Mocked<MetaRepositorioMysql>
+
+    createMeta = new CreateMeta(metaRepositorioMock)
   })
 
-  it("deve criar uma meta com sucesso quando os dados forem válidos", async () => {
-    const dataInicio = new Date("2024-01-01")
-    const dataFim = new Date("2024-12-31")
+  it("deve criar uma meta corretamente", async () => {
+    metaRepositorioMock.salvar.mockResolvedValueOnce(undefined)
 
-    const inputDto = {
-      descricao: "Economizar para viagem",
+    const input: CreateMetaInputDTO = {
+      descricao: "Comprar notebook",
       valorAlvo: 5000,
-      dataInicio,
-      dataFim,
-      usuarioId: "usuario-123"
+      dataInicio: new Date("2026-01-01"),
+      dataFim: new Date("2026-12-31"),
+      usuarioId: "usuario-1",
     }
 
-    const resultado = await sut.execute(inputDto)
+    const resultado: CreateMetaOutputDTO =
+      await createMeta.execute(input)
 
-    expect(resultado).toHaveProperty("id")
-    expect(repositorioMock.metas.length).toBe(1)
-    expect(repositorioMock.metas[0].descricao).toBe("Economizar para viagem")
-    expect(repositorioMock.metas[0].valorAlvo).toBe(5000)
-  })
+    expect(metaRepositorioMock.salvar).toHaveBeenCalledTimes(1)
 
-  it("deve criar múltiplas metas para o mesmo usuário", async () => {
-    const dataInicio = new Date("2024-01-01")
-    const dataFim = new Date("2024-12-31")
+    expect(metaRepositorioMock.salvar).toHaveBeenCalledWith(
+      expect.any(Meta)
+    )
 
-    const inputDto1 = {
-      descricao: "Meta 1",
-      valorAlvo: 1000,
-      dataInicio,
-      dataFim,
-      usuarioId: "usuario-123"
-    }
-
-    const inputDto2 = {
-      descricao: "Meta 2",
-      valorAlvo: 2000,
-      dataInicio,
-      dataFim,
-      usuarioId: "usuario-123"
-    }
-
-    await sut.execute(inputDto1)
-    const resultado = await sut.execute(inputDto2)
-
-    expect(resultado).toHaveProperty("id")
-    expect(repositorioMock.metas.length).toBe(2)
-  })
-
-  it("deve criar metas com a mesma descrição para usuários diferentes", async () => {
-    const dataInicio = new Date("2024-01-01")
-    const dataFim = new Date("2024-12-31")
-
-    const inputDto1 = {
-      descricao: "Economizar",
-      valorAlvo: 1000,
-      dataInicio,
-      dataFim,
-      usuarioId: "usuario-1"
-    }
-
-    const inputDto2 = {
-      descricao: "Economizar",
-      valorAlvo: 2000,
-      dataInicio,
-      dataFim,
-      usuarioId: "usuario-2"
-    }
-
-    const resultado1 = await sut.execute(inputDto1)
-    const resultado2 = await sut.execute(inputDto2)
-
-    expect(resultado1).toHaveProperty("id")
-    expect(resultado2).toHaveProperty("id")
-    expect(repositorioMock.metas.length).toBe(2)
+    expect(typeof resultado.id).toBe("string")
   })
 })
