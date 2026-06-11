@@ -1,14 +1,16 @@
 import { FiltrarTransacao } from "../../aplicacao/usecase/transacao/FiltrarTransacao"
 import type { FiltrarTransacaoInputDTO } from "../../aplicacao/dto/transacao/FiltrarTransacaoInputDTO"
-import { TransacaoRepositorioMock } from "./TransacaoRepositorioMock"
+import { TransacaoRepositorioMysql } from "../../infra/bd/mysql/TransacaoRepositorioMysql"
 import { Transacao } from "../../dominio/entidades/Transacao"
 
+jest.mock("../../infra/bd/mysql/TransacaoRepositorioMysql")
+
 describe("Caso de Uso - FiltrarTransacao", () => {
-  let repositorioMock: TransacaoRepositorioMock
+  let repositorioMock: jest.Mocked<TransacaoRepositorioMysql>
   let sut: FiltrarTransacao
 
   beforeEach(() => {
-    repositorioMock = new TransacaoRepositorioMock()
+    repositorioMock = new TransacaoRepositorioMysql() as jest.Mocked<TransacaoRepositorioMysql>
     sut = new FiltrarTransacao(repositorioMock)
   })
 
@@ -19,8 +21,7 @@ describe("Caso de Uso - FiltrarTransacao", () => {
     const transacao1 = Transacao.create("RECEITA", "Salário", 3000, new Date("2024-01-15"), "usuario-123", "categoria-1")
     const transacao2 = Transacao.create("DESPESA", "Aluguel", 1500, new Date("2024-02-15"), "usuario-123", "categoria-2")
 
-    await repositorioMock.salvar(transacao1)
-    await repositorioMock.salvar(transacao2)
+    repositorioMock.filtrarPorPeriodo.mockResolvedValueOnce([transacao1])
 
     const inputDto: FiltrarTransacaoInputDTO = {
       usuarioId: "usuario-123",
@@ -41,9 +42,7 @@ describe("Caso de Uso - FiltrarTransacao", () => {
     const transacao2 = Transacao.create("DESPESA", "Aluguel", 1500, data, "usuario-123", "categoria-2")
     const transacao3 = Transacao.create("DESPESA", "Comida", 200, data, "usuario-123", "categoria-1")
 
-    await repositorioMock.salvar(transacao1)
-    await repositorioMock.salvar(transacao2)
-    await repositorioMock.salvar(transacao3)
+    repositorioMock.filtrarPorCategoria.mockResolvedValueOnce([transacao1, transacao3])
 
     const inputDto: FiltrarTransacaoInputDTO = {
       usuarioId: "usuario-123",
@@ -53,7 +52,7 @@ describe("Caso de Uso - FiltrarTransacao", () => {
     const resultado = await sut.execute(inputDto)
 
     expect(resultado).toHaveLength(2)
-    expect(resultado.every(t => t.categoriaId === "categoria-1")).toBe(true)
+    expect(resultado.every((t) => t.categoriaId === "categoria-1")).toBe(true)
   })
 
   it("deve retornar todas as transações quando nenhum filtro específico for fornecido", async () => {
@@ -62,8 +61,7 @@ describe("Caso de Uso - FiltrarTransacao", () => {
     const transacao1 = Transacao.create("RECEITA", "Salário", 3000, data, "usuario-123", "categoria-1")
     const transacao2 = Transacao.create("DESPESA", "Aluguel", 1500, data, "usuario-123", "categoria-2")
 
-    await repositorioMock.salvar(transacao1)
-    await repositorioMock.salvar(transacao2)
+    repositorioMock.listarPorUsuario.mockResolvedValueOnce([transacao1, transacao2])
 
     const inputDto: FiltrarTransacaoInputDTO = {
       usuarioId: "usuario-123"
@@ -91,8 +89,7 @@ describe("Caso de Uso - FiltrarTransacao", () => {
     const dataInicio = new Date("2024-01-01")
     const dataFim = new Date("2024-01-31")
 
-    const transacao = Transacao.create("RECEITA", "Salário", 3000, new Date("2024-12-15"), "usuario-123", "categoria-1")
-    await repositorioMock.salvar(transacao)
+    repositorioMock.filtrarPorPeriodo.mockResolvedValueOnce([])
 
     const inputDto: FiltrarTransacaoInputDTO = {
       usuarioId: "usuario-123",

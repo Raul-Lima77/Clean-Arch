@@ -1,24 +1,30 @@
 import { CreateTransacao } from "../../aplicacao/usecase/transacao/CreateTransacao"
 import type { CreateTransacaoInputDTO } from "../../aplicacao/dto/transacao/CreateTransacaoInputDTO"
 import type { CreateTransacaoOutputDTO } from "../../aplicacao/dto/transacao/CreateTransacaoOutputDTO"
-import { TransacaoRepositorioMock } from "./TransacaoRepositorioMock"
-import { UsuarioRepositorioMock } from "../testsUseCaseUsuario/UsuarioRepositorioMock"
 import { Usuario } from "../../dominio/entidades/Usuario"
+import { TransacaoRepositorioMysql } from "../../infra/bd/mysql/TransacaoRepositorioMysql"
+import { UsuarioRepositorioMysql } from "../../infra/bd/mysql/UsuarioRepositorioMysql"
+
+jest.mock("../../infra/bd/mysql/TransacaoRepositorioMysql")
+jest.mock("../../infra/bd/mysql/UsuarioRepositorioMysql")
 
 describe("Caso de Uso - CreateTransacao", () => {
-  let transacaoRepositorioMock: TransacaoRepositorioMock
-  let usuarioRepositorioMock: UsuarioRepositorioMock
+  let transacaoRepositorioMock: jest.Mocked<TransacaoRepositorioMysql>
+  let usuarioRepositorioMock: jest.Mocked<UsuarioRepositorioMysql>
   let sut: CreateTransacao
 
   beforeEach(() => {
-    transacaoRepositorioMock = new TransacaoRepositorioMock()
-    usuarioRepositorioMock = new UsuarioRepositorioMock()
+    transacaoRepositorioMock = new TransacaoRepositorioMysql() as jest.Mocked<TransacaoRepositorioMysql>
+    usuarioRepositorioMock = new UsuarioRepositorioMysql() as jest.Mocked<UsuarioRepositorioMysql>
     sut = new CreateTransacao(transacaoRepositorioMock, usuarioRepositorioMock)
   })
 
   it("deve criar uma transação de receita com sucesso", async () => {
     const usuario = Usuario.create("João", "joao@email.com", "senha123")
-    await usuarioRepositorioMock.salvar(usuario)
+
+    usuarioRepositorioMock.buscarPorId.mockResolvedValueOnce(usuario)
+    transacaoRepositorioMock.salvar.mockResolvedValueOnce(undefined)
+    usuarioRepositorioMock.atualizar.mockResolvedValueOnce(undefined)
 
     const inputDto: CreateTransacaoInputDTO = {
       tipo: "RECEITA" as const,
@@ -34,13 +40,16 @@ describe("Caso de Uso - CreateTransacao", () => {
     expect(resultado).toHaveProperty("id")
     expect(resultado).toHaveProperty("novoSaldo")
     expect(resultado.novoSaldo).toBe(3000)
-    expect(transacaoRepositorioMock.transacoes.length).toBe(1)
+    expect(transacaoRepositorioMock.salvar).toHaveBeenCalledTimes(1)
   })
 
   it("deve criar uma transação de despesa com sucesso", async () => {
     const usuario = Usuario.create("Maria", "maria@email.com", "senha123")
     usuario.atualizarSaldo(5000)
-    await usuarioRepositorioMock.salvar(usuario)
+
+    usuarioRepositorioMock.buscarPorId.mockResolvedValueOnce(usuario)
+    transacaoRepositorioMock.salvar.mockResolvedValueOnce(undefined)
+    usuarioRepositorioMock.atualizar.mockResolvedValueOnce(undefined)
 
     const inputDto: CreateTransacaoInputDTO = {
       tipo: "DESPESA" as const,
@@ -55,10 +64,12 @@ describe("Caso de Uso - CreateTransacao", () => {
 
     expect(resultado).toHaveProperty("id")
     expect(resultado.novoSaldo).toBe(4800)
-    expect(transacaoRepositorioMock.transacoes.length).toBe(1)
+    expect(transacaoRepositorioMock.salvar).toHaveBeenCalledTimes(1)
   })
 
   it("deve lançar um erro se o usuário não existir", async () => {
+    usuarioRepositorioMock.buscarPorId.mockResolvedValueOnce(null)
+
     const inputDto: CreateTransacaoInputDTO = {
       tipo: "RECEITA" as const,
       descricao: "Transação",
@@ -73,7 +84,10 @@ describe("Caso de Uso - CreateTransacao", () => {
 
   it("deve atualizar o saldo do usuário após criar a transação", async () => {
     const usuario = Usuario.create("Pedro", "pedro@email.com", "senha123")
-    await usuarioRepositorioMock.salvar(usuario)
+
+    usuarioRepositorioMock.buscarPorId.mockResolvedValueOnce(usuario)
+    transacaoRepositorioMock.salvar.mockResolvedValueOnce(undefined)
+    usuarioRepositorioMock.atualizar.mockResolvedValueOnce(undefined)
 
     const inputDto: CreateTransacaoInputDTO = {
       tipo: "RECEITA" as const,
@@ -86,7 +100,6 @@ describe("Caso de Uso - CreateTransacao", () => {
 
     await sut.execute(inputDto)
 
-    const usuarioAtualizado = await usuarioRepositorioMock.buscarPorId(usuario.id)
-    expect(usuarioAtualizado?.saldo).toBe(1500)
+    expect(usuarioRepositorioMock.atualizar).toHaveBeenCalledWith(expect.objectContaining({ saldo: 1500 }))
   })
 })
