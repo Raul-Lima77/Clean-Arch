@@ -13,7 +13,6 @@ describe("Caso de Uso - CreateUsuario", () => {
   beforeEach(() => {
 
     repositorioMock = new UsuarioRepositorioMysql() as jest.Mocked<UsuarioRepositorioMysql>
-    
     sut = new CreateUsuario(repositorioMock) 
   })
 
