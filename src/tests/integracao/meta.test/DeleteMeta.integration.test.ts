@@ -1,6 +1,6 @@
 import { DeleteMeta } from "../../../aplicacao/usecase/meta/DeleteMeta";
 import { MetaRepositorioMysql } from "../../../infra/bd/mysql/MetaRepositorioMysql";
-import { criarMeta, criarUsuario } from "../setup/seed";
+import { criarMeta, criarUsuario } from "../../setup/seed";
 
 describe("Integração - DeleteMeta", () => {
 
