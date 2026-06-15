@@ -6,3 +6,5 @@ export const conexao = mysql.createPool({
   password: "1",
   database: "finance",
 })
+
+export default conexao

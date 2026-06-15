@@ -27,7 +27,7 @@ describe("Caso de Uso - DeleteTransacao", () => {
 
     usuarioRepositorioMock.buscarPorId.mockResolvedValueOnce(usuario)
     transacaoRepositorioMock.buscarPorId.mockResolvedValueOnce(transacao)
-    transacaoRepositorioMock.remover.mockResolvedValueOnce(undefined)
+    transacaoRepositorioMock.remover.mockResolvedValueOnce(true)
     usuarioRepositorioMock.atualizar.mockResolvedValueOnce(undefined)
 
     const inputDto: DeleteTransacaoDTO = {
@@ -49,7 +49,7 @@ describe("Caso de Uso - DeleteTransacao", () => {
 
     usuarioRepositorioMock.buscarPorId.mockResolvedValueOnce(usuario)
     transacaoRepositorioMock.buscarPorId.mockResolvedValueOnce(transacao)
-    transacaoRepositorioMock.remover.mockResolvedValueOnce(undefined)
+    transacaoRepositorioMock.remover.mockResolvedValueOnce(true)
     usuarioRepositorioMock.atualizar.mockResolvedValueOnce(undefined)
 
     const inputDto: DeleteTransacaoDTO = {
