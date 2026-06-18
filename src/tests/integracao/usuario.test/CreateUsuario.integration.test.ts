@@ -1,46 +1,47 @@
-import { CreateUsuario } from "../../../aplicacao/usecase/usuario/CreateUsuario";
-import { UsuarioRepositorioMysql } from "../../../infra/bd/mysql/UsuarioRepositorioMysql";
+import { CreateUsuario } from "../../../aplicacao/usecase/usuario/CreateUsuario"
+import { UsuarioRepositorioMysql } from "../../../infra/bd/mysql/UsuarioRepositorioMysql"
 
 describe("Integração - CreateUsuario", () => {
-
   test("deve criar um usuário com sucesso", async () => {
+    const repositorio = new UsuarioRepositorioMysql()
+    const usecase = new CreateUsuario(repositorio)
 
-    const usecase = new CreateUsuario(
-      new UsuarioRepositorioMysql()
-    );
+    const email = `alice${Date.now()}@email.com`
 
     const output = await usecase.execute({
-      nome: "Raul Lima",
-      email: `raul${Date.now()}@gmail.com`,
-      senha: "12345678"
-    });
+      nome: "Maria Alice",
+      email,
+      senha: "senha12345",
+    })
 
-    expect(output.id).toBeDefined();
+    expect(output.id).toBeDefined()
 
-  });
+    const usuarioSalvo = await repositorio.buscarPorEmail(email)
+
+    expect(usuarioSalvo).not.toBeNull()
+    expect(usuarioSalvo?.id).toBe(output.id)
+    expect(usuarioSalvo?.nome).toBe("Maria Alice")
+    expect(usuarioSalvo?.email).toBe(email)
+  })
 
   test("não deve permitir e-mail já cadastrado", async () => {
+    const repositorio = new UsuarioRepositorioMysql()
+    const usecase = new CreateUsuario(repositorio)
 
-    const usecase = new CreateUsuario(
-      new UsuarioRepositorioMysql()
-    );
-
-    const email = `raul${Date.now()}@gmail.com`;
+    const email = `duplicado${Date.now()}@email.com`
 
     await usecase.execute({
-      nome: "Raul",
+      nome: "Maria Alice",
       email,
-      senha: "12345678"
-    });
+      senha: "senha12345",
+    })
 
     await expect(
       usecase.execute({
-        nome: "Outro Usuário",
+        nome: "Outra Pessoa",
         email,
-        senha: "87654321"
+        senha: "outrasenha123",
       })
-    ).rejects.toThrow("E-mail já cadastrado");
-
-  });
-
-});
+    ).rejects.toThrow("E-mail já cadastrado")
+  })
+})
