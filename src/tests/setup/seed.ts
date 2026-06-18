@@ -83,5 +83,16 @@ export async function criarTransacao(
   return id;
 }
 
+export async function limparBanco() {
+  await conexao.query("SET FOREIGN_KEY_CHECKS = 0");
 
+  try {
+    await conexao.query("TRUNCATE TABLE transacoes");
+    await conexao.query("TRUNCATE TABLE metas");
+    await conexao.query("TRUNCATE TABLE categorias");
+    await conexao.query("TRUNCATE TABLE usuarios");
+  } finally {
+    await conexao.query("SET FOREIGN_KEY_CHECKS = 1");
+  }
+}
 // Raul Lima
