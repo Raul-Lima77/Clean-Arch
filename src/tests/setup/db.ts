@@ -4,8 +4,6 @@ import "reflect-metadata";
 beforeAll(async () => {
   await conexao.query("DELETE FROM transacoes");
   await conexao.query("DELETE FROM metas");
-  await conexao.query("DELETE FROM despesas");
-  await conexao.query("DELETE FROM receitas");
   await conexao.query("DELETE FROM categorias");
   await conexao.query("DELETE FROM usuarios");
 });
@@ -13,8 +11,6 @@ beforeAll(async () => {
 beforeEach(async () => {
   await conexao.query("DELETE FROM transacoes");
   await conexao.query("DELETE FROM metas");
-  await conexao.query("DELETE FROM despesas");
-  await conexao.query("DELETE FROM receitas");
   await conexao.query("DELETE FROM categorias");
   await conexao.query("DELETE FROM usuarios");
 });
