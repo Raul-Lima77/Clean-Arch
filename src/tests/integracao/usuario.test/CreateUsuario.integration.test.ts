@@ -6,7 +6,7 @@ describe("Integração - CreateUsuario", () => {
     const repositorio = new UsuarioRepositorioMysql()
     const usecase = new CreateUsuario(repositorio)
 
-    const email = `alice${Date.now()}@email.com`
+    const email = `alice@email.com`
 
     const output = await usecase.execute({
       nome: "Maria Alice",
@@ -28,7 +28,7 @@ describe("Integração - CreateUsuario", () => {
     const repositorio = new UsuarioRepositorioMysql()
     const usecase = new CreateUsuario(repositorio)
 
-    const email = `duplicado${Date.now()}@email.com`
+    const email = `alice@email.com`
 
     await usecase.execute({
       nome: "Maria Alice",

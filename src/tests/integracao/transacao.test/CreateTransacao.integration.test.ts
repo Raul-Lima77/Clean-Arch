@@ -1,7 +1,8 @@
+import { CreateTransacaoInputDTO } from "@/src/aplicacao/dto/transacao/CreateTransacaoInputDTO";
 import { CreateTransacao } from "../../../aplicacao/usecase/transacao/CreateTransacao";
 import { TransacaoRepositorioMysql } from "../../../infra/bd/mysql/TransacaoRepositorioMysql";
 import { UsuarioRepositorioMysql } from "../../../infra/bd/mysql/UsuarioRepositorioMysql";
-import { criarUsuario, criarCategoria , limparBanco, criarTransacao } from "../../setup/seed";
+import { criarUsuario, criarCategoria , limparBanco } from "../../setup/seed";
 
 describe("Integração - Criar Transação", () => {
 
@@ -27,7 +28,14 @@ describe("Integração - Criar Transação", () => {
         const usuarioId = await criarUsuario()
         const categoriaId = await criarCategoria(usuarioId)
 
-        const input = await criarTransacao(usuarioId,categoriaId)
+        const input: CreateTransacaoInputDTO = {
+        descricao: "Mercado",
+        valor: 100,
+        tipo: "DESPESA",
+        data: new Date(),
+        usuarioId,
+        categoriaId
+        }
 
         const output = await usecase.execute(input)
 
@@ -46,12 +54,19 @@ describe("Integração - Criar Transação", () => {
         const usuarioAtualizado = await usuarioRepositorio.buscarPorId(usuarioId);
 
         expect(usuarioAtualizado).not.toBeNull();
-        expect(usuarioAtualizado?.saldo).toBe(5000);
+        expect(usuarioAtualizado?.saldo).toBe(100);
 
 
         test("deve lançar erro quando o usuário não existir", async () => {
 
-            const input = await criarTransacao('usuario-inexistente','categoria-inexistente')
+            const input: CreateTransacaoInputDTO = {
+            descricao: "Aluguel",
+            valor: 500,
+            tipo: "DESPESA",
+            data: new Date(),
+            usuarioId: "usuario-inexistente",
+            categoriaId: "categoria-inexistente"
+            }
 
 
             await expect(usecase.execute(input)).rejects.toThrow(
