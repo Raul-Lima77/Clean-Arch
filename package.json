@@ -15,7 +15,8 @@
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
-    "test": "jest"
+    "test": "jest",
+    "test:e2e": "jest --runInBand src/tests/e2e/**/*.test.ts"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -39,8 +40,10 @@
     "@types/node": "^22",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
+    "@types/supertest": "^2.0.14",
     "jest": "^30.3.0",
     "postcss": "^8.5",
+    "supertest": "^7.2.2",
     "tailwindcss": "4.1.17",
     "ts-jest": "^29.4.9",
     "tsx": "^4.19.4",

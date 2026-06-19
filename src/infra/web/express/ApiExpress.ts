@@ -12,8 +12,12 @@ export class ApiExpress {
         this.app.use(routes)
     }
 
+    public getApp() {
+        return this.app;
+    }
+
     public start(port: number) {
-        this.app.listen(port, () => {
+        return this.app.listen(port, () => {
             console.log(`Server running on port ${port} http://localhost:${port}`
             );
         });
